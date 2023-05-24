@@ -2,7 +2,8 @@ import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer, Conne
 import { TalkService } from './talk.service'
 import { CreateTalkDto } from './dto/create-talk.dto'
 import { UpdateTalkDto } from './dto/update-talk.dto'
-import { Server } from 'http'
+import { Server, Socket } from 'socket.io'
+import { PrismaService } from 'src/prisma/prisma.service'
 
 @WebSocketGateway({
   cors: {
@@ -10,13 +11,43 @@ import { Server } from 'http'
   },
 })
 export class TalkGateway {
-  constructor(private readonly talkService: TalkService) {}
+  constructor(private readonly talkService: TalkService, private prisma: PrismaService) {}
   @WebSocketServer()
   server: Server
+  // socket连接钩子
+  async handleConnection(client: Socket): Promise<string> {
+    const userRoom = client.handshake.query
+    console.log(userRoom)
+
+    // if (userRoom) {
+    //   client.join(userRoom)
+    // }
+    return '连接成功'
+  }
+
+  // socket断连钩子
+  async handleDisconnect(): Promise<any> {
+    // this.getActiveGroupUser()
+  }
   @SubscribeMessage('createTalk')
   create(@MessageBody() createTalkDto: any, @ConnectedSocket() socket: any) {
-    console.log(socket.id)
     return this.talkService.create(createTalkDto)
+  }
+  @SubscribeMessage('send')
+  async send(@MessageBody() message: string, @ConnectedSocket() socket: any) {
+    console.log('server received:', message)
+    //广播给所有人
+    // this.server. broadcast.emit('message', message)
+    const connt = await this.prisma.message.count()
+    this.server.volatile.emit('message', { id: connt + 1, content: message, createAt: '2lmm' })
+    const create = await this.prisma.message.create({
+      data: {
+        content: message,
+      },
+    })
+    const res = await this.prisma.message.findMany()
+    console.log(res)
+    return create
   }
   @SubscribeMessage('findAllTalk')
   findAll() {

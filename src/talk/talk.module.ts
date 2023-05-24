@@ -1,8 +1,10 @@
-import { Module } from '@nestjs/common';
-import { TalkService } from './talk.service';
-import { TalkGateway } from './talk.gateway';
+import { Module } from '@nestjs/common'
+import { TalkService } from './talk.service'
+import { TalkGateway } from './talk.gateway'
+import { TalkController } from './talk.controller'
 
 @Module({
-  providers: [TalkGateway, TalkService]
+  controllers: [TalkController],
+  providers: [TalkGateway, TalkService],
 })
 export class TalkModule {}
