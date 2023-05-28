@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEmail, IsNotEmpty, Length } from 'class-validator'
+import { Allow, IsEmail, IsNotEmpty, Length } from 'class-validator'
 import { IsConfirmRule } from 'src/validate/is-confirm.rule'
 import { IsNotExistsRule } from 'src/validate/is-not-exists.rule'
 
@@ -17,4 +17,10 @@ export class RegisterAuthDto {
   @ApiProperty({ description: '确认密码' })
   @IsNotEmpty({ message: '确认密码不能为空' })
   password_confirm: string
+
+  @Allow()
+  captchKey: string
+
+  @IsNotEmpty({ message: '验证码不能为空' })
+  captchCode: string
 }

@@ -16,12 +16,12 @@ export class TalkGateway {
   server: Server
   // socket连接钩子
   async handleConnection(client: Socket): Promise<string> {
-    const userRoom = client.handshake.query
+    const userRoom = client.handshake.query.userId
     console.log(userRoom)
 
-    // if (userRoom) {
-    //   client.join(userRoom)
-    // }
+    if (userRoom) {
+      client.join(userRoom)
+    }
     return '连接成功'
   }
 
@@ -34,7 +34,10 @@ export class TalkGateway {
     return this.talkService.create(createTalkDto)
   }
   @SubscribeMessage('send')
-  async send(@MessageBody() message: string, @ConnectedSocket() socket: any) {
+  async send(
+    @MessageBody() message: { content: string; avatar: string; userId: number; sender: string },
+    @ConnectedSocket() socket: any,
+  ) {
     console.log('server received:', message)
     //广播给所有人
     // this.server. broadcast.emit('message', message)
@@ -42,16 +45,28 @@ export class TalkGateway {
     this.server.volatile.emit('message', { id: connt + 1, content: message, createAt: '2lmm' })
     const create = await this.prisma.message.create({
       data: {
-        content: message,
+        content: message.content,
+        avatar: message.avatar,
+        userId: +message.userId,
+        sender: message.sender,
       },
     })
     const res = await this.prisma.message.findMany()
     console.log(res)
     return create
   }
+  @SubscribeMessage('join')
+  join(@MessageBody() room: string, @ConnectedSocket() socket: any) {
+    // socket.join(room)
+    this.server.emit('join', room)
+  }
   @SubscribeMessage('findAllTalk')
   findAll() {
     return this.talkService.findAll()
+  }
+  @SubscribeMessage('leave')
+  leave(@MessageBody() room: string, @ConnectedSocket() socket: any) {
+    this.server.volatile.emit('leave', room)
   }
   @SubscribeMessage('findOneTalk')
   findOne(@MessageBody() id: number) {

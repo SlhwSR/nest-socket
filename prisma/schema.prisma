@@ -9,7 +9,7 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
- 
+
 model user {
   id           Int             @id @default(autoincrement()) @db.UnsignedInt()
   email        String          @unique
@@ -31,6 +31,14 @@ model user {
   blackRole    Boolean         @default(false)
   personalSign String?
   ip           String?
+  friends      Friend[]
+}
+
+model Friend {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  user      user     @relation(fields: [friendId], references: [id])
+  friendId  Int      @db.UnsignedInt()
 }
 
 model category {
@@ -143,8 +151,12 @@ model collect {
   videoId   Int      @db.UnsignedInt()
   createdAt DateTime @default(now())
 }
-model message{
+
+model message {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt()
+  sender    String
+  avatar    String
+  userId    Int      @db.UnsignedInt()
   content   String
   createdAt DateTime @default(now())
 }

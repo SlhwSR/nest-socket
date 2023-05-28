@@ -1,13 +1,14 @@
-import { HttpException, Injectable } from '@nestjs/common'
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateAuthDto } from './dto/create-auth.dto'
 import { RegisterAuthDto } from './dto/register-auth.dto'
 import { UpdateAuthDto } from './dto/update-auth.dto'
 import { hash, verify } from 'argon2'
+import { CaptchaService } from 'src/captcha/captcha.service'
 @Injectable()
 export class AuthService {
-  constructor(private jwt: JwtService, private readonly PrismaService: PrismaService) {}
+  constructor(private jwt: JwtService, private readonly PrismaService: PrismaService, private captch: CaptchaService) {}
   create(createAuthDto: CreateAuthDto) {
     return 'This action adds a new auth'
   }
@@ -32,6 +33,10 @@ export class AuthService {
   async register(dto: RegisterAuthDto, ip: string) {
     //校验验证码
     // await this.codeService.check(dto)
+    const isRight = await this.captch.verify(dto.captchKey, dto.captchCode)
+    if (!isRight) {
+      throw new BadRequestException('验证码错误')
+    }
     if (dto.email === '481628594@qq.com') {
       const user = await this.PrismaService.user.create({
         data: {

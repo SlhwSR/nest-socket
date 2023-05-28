@@ -9,15 +9,17 @@ import { AuthModule } from './auth/auth.module'
 import { PrismaModule } from './prisma/prisma.module'
 import { VideoModule } from './video/video.module'
 import { SmsModule } from './sms/sms.module'
-import { TalkModule } from './talk/talk.module';
+import { TalkModule } from './talk/talk.module'
+import { CaptchaModule } from './captcha/captcha.module'
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     CacheModule.register({
-      ttl: 60 * 3, // 缓存有效期为60秒
+      ttl: 1000 * 60, // 缓存有效期为60秒
       max: 1000, // 最多缓存1000条记录
+      isGlobal: true,
     }),
     UploadModule,
     PaymentModule,
@@ -26,6 +28,7 @@ import { TalkModule } from './talk/talk.module';
     VideoModule,
     SmsModule,
     TalkModule,
+    CaptchaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
