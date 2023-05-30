@@ -62,8 +62,14 @@ export class TalkGateway {
     return create
   }
   @SubscribeMessage('join')
-  join(@MessageBody() room: string, @ConnectedSocket() socket: any) {
-    this.server.volatile.emit('join', room)
+  join(@MessageBody() room: any, @ConnectedSocket() socket: any) {
+    this.server.volatile.emit('join', {
+      content: room?.email + '加入了会话',
+      avatar: room?.avatar,
+      userId: room?.id,
+      sender: '系统通知',
+    })
+
     return room
   }
   @SubscribeMessage('findAllTalk')
@@ -71,9 +77,22 @@ export class TalkGateway {
     return this.talkService.findAll()
   }
   @SubscribeMessage('leave')
-  leave(@MessageBody() room: string, @ConnectedSocket() socket: any) {
+  async leave(@MessageBody() room: any, @ConnectedSocket() socket: any) {
     console.log(room)
-    this.server.volatile.emit('leave', room)
+    await this.prisma.message.create({
+      data: {
+        content: room?.email + '离开了会话',
+        avatar: room?.avatar,
+        userId: room?.id,
+        sender: '系统通知',
+      },
+    })
+    this.server.volatile.emit('leave', {
+      content: room?.email + '离开了会话',
+      avatar: room?.avatar,
+      userId: room?.id,
+      sender: '系统通知',
+    })
     return room
   }
   @SubscribeMessage('findOneTalk')
