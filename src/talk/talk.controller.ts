@@ -20,12 +20,4 @@ export class TalkController {
   //   payOrder(@Param() id: any, @Body() payOrderDto: any) {
   //     return '#'
   //   }
-  //查询订单
-  //退款订单
-  //关闭订单
-  //查询退款
-  //下载对账单
-  //交易保障
-  //转换短链接
-  //查询分账结果
 }
