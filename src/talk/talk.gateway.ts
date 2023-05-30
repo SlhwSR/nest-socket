@@ -4,6 +4,7 @@ import { CreateTalkDto } from './dto/create-talk.dto'
 import { UpdateTalkDto } from './dto/update-talk.dto'
 import { Server, Socket } from 'socket.io'
 import { PrismaService } from 'src/prisma/prisma.service'
+import * as dayjs from 'dayjs'
 
 @WebSocketGateway({
   cors: {
@@ -42,12 +43,17 @@ export class TalkGateway {
     //广播给所有人
     // this.server. broadcast.emit('message', message)
     const connt = await this.prisma.message.count()
-    this.server.volatile.emit('message', { id: connt + 1, content: message, createAt: '2lmm' })
+    this.server.volatile.emit('message', {
+      userId: message.userId,
+      sender: message.sender,
+      content: message.content,
+      avatar: message.avatar,
+    })
     const create = await this.prisma.message.create({
       data: {
         content: message.content,
         avatar: message.avatar,
-        userId: +message.userId,
+        userId: message.userId,
         sender: message.sender,
       },
     })
@@ -57,8 +63,8 @@ export class TalkGateway {
   }
   @SubscribeMessage('join')
   join(@MessageBody() room: string, @ConnectedSocket() socket: any) {
-    // socket.join(room)
-    this.server.emit('join', room)
+    this.server.volatile.emit('join', room)
+    return room
   }
   @SubscribeMessage('findAllTalk')
   findAll() {
@@ -66,7 +72,9 @@ export class TalkGateway {
   }
   @SubscribeMessage('leave')
   leave(@MessageBody() room: string, @ConnectedSocket() socket: any) {
+    console.log(room)
     this.server.volatile.emit('leave', room)
+    return room
   }
   @SubscribeMessage('findOneTalk')
   findOne(@MessageBody() id: number) {
