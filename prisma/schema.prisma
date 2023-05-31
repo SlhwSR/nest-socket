@@ -57,8 +57,10 @@ model Post {
   title      String
   content    String
   comment    comment[]
-  category   category  @relation(fields: [categoryId], references: [id])
-  categoryId Int       @db.UnsignedInt
+  category   category? @relation(fields: [categoryId], references: [id])
+  categoryId Int?      @db.UnsignedInt
+  covers     String    @db.Text
+  createdAt  DateTime  @default(now())
 }
 
 model comment {
