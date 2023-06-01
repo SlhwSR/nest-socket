@@ -48,11 +48,64 @@ export class PostService {
     return `This action returns a #${id} post`
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`
+  async update(id: number, updatePostDto: UpdatePostDto) {
+    try {
+      await this.prisma.post.update({
+        where: {
+          id,
+        },
+        data: {
+          title: updatePostDto.title,
+          content: updatePostDto.content,
+          covers: updatePostDto?.covers,
+          userId: updatePostDto?.userId,
+          categoryId: updatePostDto?.categoryId,
+        },
+      })
+      return { code: 0, message: '更新成功' }
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`
+  async remove(id: number) {
+    try {
+      await this.prisma.post.delete({
+        where: {
+          id,
+        },
+      })
+      return {
+        code: 0,
+        message: '删除成功',
+      }
+    } catch (error) {
+      console.log(error)
+
+      throw new BadRequestException(error)
+    }
+  }
+  // 根据用户id查找用户的所有文章
+  async findUserPost(id: number) {
+    try {
+      const result = await this.prisma.post.findMany({
+        where: {
+          userId: id,
+        },
+        include: {
+          user: true,
+          comment: true,
+          category: true,
+        },
+        orderBy: [
+          {
+            createdAt: 'desc',
+          },
+        ],
+      })
+      return result
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
   }
 }

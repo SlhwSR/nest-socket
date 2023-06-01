@@ -61,6 +61,7 @@ model Post {
   categoryId Int?      @db.UnsignedInt
   covers     String    @db.Text
   createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model comment {
