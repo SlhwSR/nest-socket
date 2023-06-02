@@ -43,8 +43,8 @@ model Friend {
 
 model category {
   id     Int     @id @default(autoincrement()) @db.UnsignedInt
-  user   user?   @relation(fields: [userId], references: [id])
-  userId Int?    @db.UnsignedInt()
+  user   user    @relation(fields: [userId], references: [id])
+  userId Int     @db.UnsignedInt()
   name   String
   cover  String?
   post   Post[]
@@ -62,6 +62,8 @@ model Post {
   covers     String    @db.Text
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+  likeList   String?   @db.Text
+  disLikest  String?   @db.Text
 }
 
 model comment {

@@ -17,12 +17,6 @@ export class PostController {
   findAll() {
     return this.postService.findAll()
   }
-  @Auth()
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(+id)
-  }
-
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postService.update(+id, updatePostDto)
@@ -32,10 +26,27 @@ export class PostController {
   remove(@Param('id') id: string) {
     return this.postService.remove(+id)
   }
-
+  //根据用户id查找post
   @Auth()
   @Get('user/:id')
   findUserPost(@Param('id') id: string) {
     return this.postService.findUserPost(+id)
+  }
+  //创建分类
+  @Auth()
+  @Post('category')
+  createCategory(@Body() body: { [key: string]: any }) {
+    return this.postService.createCategory(body)
+  }
+  //查找分类
+  @Auth()
+  @Get('category')
+  findCategoryList() {
+    return this.postService.findAllCategory()
+  }
+  @Auth()
+  @Post('dianzan')
+  addZan(@Body() body: { [key: string]: any }) {
+    return this.postService.addZan(body)
   }
 }
