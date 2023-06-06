@@ -47,6 +47,6 @@ export function Video(file = 'file') {
     limits: {
       fileSize: Math.pow(1024, 2) * 12,
     },
-    fileFilter: fileFilter(['video']),
+    fileFilter: fileFilter(['video', 'image']),
   })
 }

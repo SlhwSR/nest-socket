@@ -8,7 +8,7 @@ import { Image, Markdown, Video } from './decorator/upload.decorator'
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
   @Post('image')
-  @Image()
+  @Video()
   // @Markdown('file', ['image', 'pdf'])
   // @UseInterceptors(FileInterceptor('file'))
   uploadImage(@UploadedFile() file: Express.Multer.File) {
