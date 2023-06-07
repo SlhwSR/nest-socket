@@ -44,9 +44,34 @@ export class PostController {
   findCategoryList() {
     return this.postService.findAllCategory()
   }
+  //点赞或者踩
   @Auth()
   @Post('dianzan')
   addZan(@Body() body: { [key: string]: any }) {
     return this.postService.addZan(body)
+  }
+  //评论
+  @Auth()
+  @Post('comment')
+  addComment(@Body() body: { [key: string]: any }) {
+    return this.postService.addComment(body)
+  }
+  //获取某条post的评论
+  @Auth()
+  @Get('comment/:id')
+  getComment(@Param('id') id: string) {
+    return this.postService.getComment(+id)
+  }
+  //给某条评论点赞或者踩
+  @Auth()
+  @Post('comment/likeOrDislike')
+  likeOrDislike(@Body() body: { [key: string]: any }) {
+    return this.postService.addCommentZan(body)
+  }
+  //给某条评论回复
+  @Auth()
+  @Post('comment/reply')
+  replyComment(@Body() body: { [key: string]: never }) {
+    return this.postService.replycomment(body)
   }
 }

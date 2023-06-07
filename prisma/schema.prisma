@@ -74,6 +74,8 @@ model comment {
   userId    Int?     @db.UnsignedInt()
   createdAt DateTime @default(now())
   content   String
+  likeList  String?  @db.Text
+  disLikest String?  @db.Text
   reply     Reply[]
 }
 
@@ -86,7 +88,8 @@ model Reply {
   replyContent String
   Replies      Reply[]  @relation("nestedReply")
   reply        Reply?   @relation("nestedReply", fields: [replyId], references: [id])
-  replyId      Int
+  replyId      Int?
+  createdAt    DateTime @default(now())
 }
 
 model VideoCategory {
