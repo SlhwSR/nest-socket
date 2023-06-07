@@ -5,6 +5,7 @@ import { UpdateTalkDto } from './dto/update-talk.dto'
 import { Server, Socket } from 'socket.io'
 import { PrismaService } from 'src/prisma/prisma.service'
 import * as dayjs from 'dayjs'
+import { BadRequestException } from '@nestjs/common'
 
 @WebSocketGateway({
   cors: {
@@ -107,5 +108,110 @@ export class TalkGateway {
   @SubscribeMessage('removeTalk')
   remove(@MessageBody() id: number) {
     return this.talkService.remove(id)
+  }
+
+  //发送好友申请
+  @SubscribeMessage('sendFriend')
+  async sendFriend(@MessageBody() data: any, @ConnectedSocket() socket: any) {
+    const { userId, friendId } = data
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        include: {
+          friends: true,
+        },
+      })
+      const friend = await this.prisma.user.findUnique({
+        where: {
+          id: friendId,
+        },
+        include: {
+          friends: true,
+        },
+      })
+      if (user.friends.find((item) => item.id === friendId)) {
+        return { code: 1, message: '已经是好友了' }
+      }
+      if (friend.friends.find((item) => item.id === userId)) {
+        return { code: 1, message: '已经是好友了' }
+      }
+      return { code: 0, message: '发送成功' }
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
+  }
+  //拒绝好友
+  @SubscribeMessage('refuseFriend')
+  async refuseFriend(@MessageBody() data: any, @ConnectedSocket() socket: any) {
+    const { userId, friendId } = data
+    try {
+      await this.prisma.$transaction([
+        this.prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            friends: {
+              disconnect: {
+                id: friendId,
+              },
+            },
+          },
+        }),
+        this.prisma.user.update({
+          where: {
+            id: friendId,
+          },
+          data: {
+            friends: {
+              disconnect: {
+                id: userId,
+              },
+            },
+          },
+        }),
+      ])
+      return { code: 0, message: '拒绝成功' }
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
+  }
+  //同意好友
+  @SubscribeMessage('agreeFriend')
+  async agreeFriend(@MessageBody() data: any, @ConnectedSocket() socket: any) {
+    const { userId, friendId } = data
+    try {
+      await this.prisma.$transaction([
+        this.prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            friends: {
+              connect: {
+                id: friendId,
+              },
+            },
+          },
+        }),
+        this.prisma.user.update({
+          where: {
+            id: friendId,
+          },
+          data: {
+            friends: {
+              connect: {
+                id: userId,
+              },
+            },
+          },
+        }),
+      ])
+      return { code: 0, message: '添加成功' }
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
   }
 }
