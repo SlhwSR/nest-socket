@@ -17,6 +17,10 @@ export class RegisterAuthDto {
   @ApiProperty({ description: '确认密码' })
   @IsNotEmpty({ message: '确认密码不能为空' })
   password_confirm: string
+  @IsNotEmpty()
+  @IsNotExistsRule('user', { message: '昵称已存在' })
+  @Length(2, 13, { message: '昵称最低2个字最高三个字' })
+  nickName: string
 
   @Allow()
   captchKey: string

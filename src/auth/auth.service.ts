@@ -54,7 +54,7 @@ export class AuthService {
         data: {
           email: dto.email,
           avatar: 'https://picsum.photos/200/300',
-          nickName: '友友',
+          nickName: dto?.nickName,
           password: await hash(dto.password),
           ip,
         },

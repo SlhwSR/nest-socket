@@ -12,6 +12,7 @@ import { SmsModule } from './sms/sms.module'
 import { TalkModule } from './talk/talk.module'
 import { CaptchaModule } from './captcha/captcha.module'
 import { PostModule } from './post/post.module';
+import { FriendModule } from './friend/friend.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,6 +32,7 @@ import { PostModule } from './post/post.module';
     TalkModule,
     CaptchaModule,
     PostModule,
+    FriendModule,
   ],
   controllers: [AppController],
   providers: [AppService],
